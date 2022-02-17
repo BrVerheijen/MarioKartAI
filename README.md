@@ -1,1 +1,1 @@
-# MarioKartAI
+# SMASH AI
