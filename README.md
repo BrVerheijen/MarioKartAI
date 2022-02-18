@@ -1,1 +1,1 @@
-# SMASH AI
+# Mario Kart AI
