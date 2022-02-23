@@ -1,10 +1,13 @@
-from cv2 import trace
+
 import retro
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.vec_env import vec_frame_stack, dummy_vec_env, subproc_vec_env
+from stable_baselines3.common.vec_env.subproc_vec_env import SubprocVecEnv
+from stable_baselines3.common.vec_env.vec_frame_stack import VecFrameStack
+from stable_baselines3.common.vec_env.dummy_vec_env import DummyVecEnv
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.ppo.policies import CnnPolicy, MlpPolicy
 
 import os
 import traceback
@@ -13,8 +16,8 @@ from mario_wrappers import *
 from retro_wrappers import wrap_deepmind_retro
 from utils import SaveOnBestTrainingRewardCallbackCustom
 
-workers = 1
-steps = 1
+workers = 4
+steps = 2000
 log_dir = './ppo_test'
 
 scenario= 'scenario'
@@ -39,7 +42,7 @@ def wrapper(env):
 def main():
 
     env = retro_make_vec_env('SuperMarioKart-Snes', scenario=scenario, state=state, n_envs=workers,
-                            monitor_dir=log_dir, vec_env_cls=subproc_vec_env, wrapper_class=wrapper, seed=0)
+                            monitor_dir=log_dir, vec_env_cls=SubprocVecEnv, wrapper_class=wrapper, seed=0)
 
 
     callback = SaveOnBestTrainingRewardCallbackCustom( check_freq=1000, log_dir=log_dir)
@@ -53,7 +56,7 @@ def main():
         model.tensorboard_log = log_dir
 
     else: 
-        model = ALGORITHM("CnnPolicy", env, verbose=1, tensorboard_log=log_dir)
+        model = ALGORITHM(CnnPolicy, env, verbose=1, tensorboard_log=log_dir)
 
     try:
         model.learn(total_timesteps=steps, callback=callback)

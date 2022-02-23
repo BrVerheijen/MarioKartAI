@@ -12,8 +12,10 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.atari_wrappers import ClipRewardEnv
 from stable_baselines3.common.atari_wrappers import MaxAndSkipEnv
-from stable_baselines3.common.vec_env import dummy_vec_env, subproc_vec_env
-from stable_baselines3.common.vec_env import vec_frame_stack
+from stable_baselines3.common.vec_env.vec_frame_stack import VecFrameStack
+from stable_baselines3.common.vec_env.subproc_vec_env import SubprocVecEnv
+from stable_baselines3.common.vec_env.dummy_vec_env import DummyVecEnv
+
 
 from retro_wrappers import *
 
@@ -79,7 +81,7 @@ def retro_make_vec_env(env_id, state=retro.State.DEFAULT, scenario=None, n_envs=
         return _init
 
     if vec_env_cls is None:
-        vec_env_cls = dummy_vec_env
+        vec_env_cls = DummyVecEnv
 
     if record:
         os.makedirs(record_path, exist_ok=True)
@@ -128,9 +130,9 @@ def make_mario_env(env_id, num_env, seed, cut_map=False, wrapper_kwargs=None, st
     set_random_seed(seed)
 
     if num_env == 1 or not use_subprocess:
-        return dummy_vec_env([make_env(i + start_index) for i in range(num_env)])
+        return DummyVecEnv([make_env(i + start_index) for i in range(num_env)])
     
-    return subproc_vec_env([make_env(i + start_index) for i in range(num_env)],
+    return SubprocVecEnv([make_env(i + start_index) for i in range(num_env)],
                             start_method=start_method)
 
 def make_mario(env_id):
