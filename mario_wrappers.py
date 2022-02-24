@@ -186,7 +186,7 @@ class Discretizer(gym.ActionWrapper):
         for action in actions:
             arr = np.array([False] * 12)
             for button in action:
-                arr[button.index(button)] = True
+                arr[buttons.index(button)] = True
             self._actions.append(arr)
         self.action_space = gym.spaces.Discrete(len(self._actions))
 
