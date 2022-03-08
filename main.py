@@ -1,3 +1,5 @@
+import os
+os.add_dll_directory("C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v11.2/bin")
 
 import retro
 
@@ -9,7 +11,7 @@ from stable_baselines3.common.vec_env.dummy_vec_env import DummyVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.ppo.policies import CnnPolicy, MlpPolicy
 
-import os
+
 import traceback
 
 from mario_wrappers import *
@@ -17,7 +19,7 @@ from retro_wrappers import wrap_deepmind_retro
 from utils import SaveOnBestTrainingRewardCallbackCustom
 
 workers = 4
-steps = 2000
+steps = 100000
 log_dir = './ppo_test'
 
 scenario= 'scenario'
@@ -30,7 +32,7 @@ state= retro.State.DEFAULT
 
 ALGORITHM = PPO
 
-RENDER= True
+RENDER=False
 
 def wrapper(env):
     env = Discretizer(env, DiscretizerActions.SIMPLE)
@@ -45,18 +47,19 @@ def main():
                             monitor_dir=log_dir, vec_env_cls=SubprocVecEnv, wrapper_class=wrapper, seed=0)
 
 
-    callback = SaveOnBestTrainingRewardCallbackCustom( check_freq=1000, log_dir=log_dir)
+    callback = SaveOnBestTrainingRewardCallbackCustom( check_freq=100, log_dir=log_dir)
 
     if os.path.exists(f"{log_dir}/best_model.zip"):
         print("LOAD BEST MODEL")
         model = ALGORITHM.load(f"{log_dir}/best_model.zip")
         model.set_env(env)
 
+        model.device = "cuda"
         model.verbose = 1
         model.tensorboard_log = log_dir
 
     else: 
-        model = ALGORITHM(CnnPolicy, env, verbose=1, tensorboard_log=log_dir)
+        model = ALGORITHM(CnnPolicy, env, verbose=1, tensorboard_log=log_dir, device="cuda")
 
     try:
         model.learn(total_timesteps=steps, callback=callback)

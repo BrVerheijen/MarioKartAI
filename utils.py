@@ -94,13 +94,13 @@ class SaveOnBestTrainingRewardCallbackCustom(BaseCallback):
             x, y = ts2xy(load_results(self.log_dir), 'timesteps')
 
             mean_reward = np.mean(y[-100:])
-            std_reward = np.std(y[-100:])
+            
             if self.verbose > 0:
                 print("Num timesteps: {}".format(self.num_timesteps))
                 print(
-						"Best mean reward: {:.2f} - Last mean reward per episode: {:.2f} +- {:.2f}"
-						.format(self.best_mean_reward, mean_reward,
-								std_reward))
+						"Best mean reward: {:.2f} - Last mean reward per episode: {:.2f}"
+						.format(self.best_mean_reward, mean_reward
+								))
             
             if mean_reward > self.best_mean_reward:
                 self.best_mean_reward = mean_reward

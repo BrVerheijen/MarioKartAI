@@ -201,6 +201,22 @@ function isHittingWall()
 	return false
 
 end
+
+
+-- function getSurfaceReward()
+
+-- 	local reward = 0
+
+-- 	if data.surface == 64 then
+-- 		reward = 0.5
+-- 	end
+-- 	if data.surface == 84 then
+-- 		reward = -0.5
+-- 	return reward
+-- 	end
+-- end
+
+
 -- function getRewardEvolution()
 -- 	local newCheckpoint = getCheckpoint()
 	
