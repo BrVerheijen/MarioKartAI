@@ -18,7 +18,7 @@ args = parser.parse_args()
 workers = 4
 steps = 2000
 
-RUNS = 3
+RUNS = 5
 
 state = retro.State.DEFAULT
 
