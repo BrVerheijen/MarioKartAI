@@ -121,6 +121,111 @@ function getSpeedRewardLess()
 	return reward
 end
 
+function getSpeedRewardPositive()
+	local speed = data.kart1_speed
+	local reward = 0
+
+	if isTurnedAround() then
+		reward = -0.1 --not sure if should keep
+	elseif speed > 900 then
+		reward=0.1
+	-- elseif speed > 800 then
+	-- 	reward=0.1
+	elseif speed >600 then
+		reward = 0.05
+	else
+		reward = 0
+	end
+
+	return reward
+end
+
+function getSpeedRewardNegative()
+	local speed = data.kart1_speed
+	local reward = 0
+
+	if isTurnedAround() then
+		reward = -0.1 --not sure if should keep
+	elseif speed >600 then
+		reward = 0
+	else
+		reward= -0.1
+	end
+	
+	return reward
+end
+
+function getSpeedRewardNegativeLenient()
+	local speed = data.kart1_speed
+	local reward = 0
+
+	if isTurnedAround() then
+		reward = -0.1 --not sure if should keep
+	elseif speed >550 then
+		reward = 0
+	else
+		reward= -0.1
+	end
+	
+	return reward
+end
+
+function getSpeedRewardLenient()	
+	local speed = data.kart1_speed
+
+	local reward = 0
+
+
+
+	if isTurnedAround() then
+		reward = -0.1 --not sure if should keep
+	elseif speed > 900 then
+		reward=0.2
+	elseif speed > 750 then
+		reward=0.1
+	elseif speed >550 then
+		reward = 0.01
+	else
+		reward= -0.1
+	end
+
+	
+	return reward
+end
+
+function getRankReward()
+	local rank = data.rank
+	local reward = 0
+
+	if rank==0 then
+		reward = 0.5
+	elseif rank < 5 then
+		reward = 0.3
+	elseif rank < 9 then
+		reward = 0
+	elseif rank < 12 then
+		reward = -0.3
+	elseif rank == 14 then 
+		reward = -0.5
+	end
+
+	return reward
+end
+
+function getSurfaceReward()
+
+	local reward = 0
+
+	if data.surface == 64 then
+		reward = 0.5
+	end
+	if data.surface == 84 then
+		reward = -0.5
+	end
+	return reward
+end
+
+
 function getRewardTrainSpeed()
 	-- 0.2 top speed, 1 passing checkpoint
 	return getSpeedReward() + getCheckpointReward() + getExperimentalReward()
@@ -133,10 +238,38 @@ function getRewardTrainSpeedLess()
 
 end
 
+function getRewardTrainSpeedPositive()
+	return getSpeedRewardPositive() + getCheckpointReward() + getExperimentalReward()
+end
+
+function getRewardTrainSpeedNegative()
+	return getSpeedRewardNegative() + getCheckpointReward() + getExperimentalReward()
+end
+
 function getRewardTrain()
 	-- 1 passing checkpoint
 	return getCheckpointReward() + getExperimentalReward()
 
+end
+
+function getRewardTrainGrandPrix()
+	return getCheckpointReward() + getExperimentalReward() + getRankReward()
+end
+
+function getRewardTrainSpeedNegativeLenient()
+	return getSpeedRewardNegativeLenient() + getCheckpointReward() + getExperimentalReward()
+end
+
+function getRewardTrainSpeedLenient()
+	return getSpeedRewardLenient() + getCheckpointReward() + getExperimentalReward()
+end
+
+function getRewardTrainSurface()
+	return getSurfaceReward() + getCheckpointReward() + getExperimentalReward()
+end
+
+function getRewardTrainSurfaceSpeed()
+	return getSurfaceReward() + getSpeedReward() + getCheckpointReward() + getExperimentalReward()
 end
 
 function isDoneTrain()

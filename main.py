@@ -11,6 +11,8 @@ from stable_baselines3.common.vec_env.vec_frame_stack import VecFrameStack
 from stable_baselines3.common.vec_env.dummy_vec_env import DummyVecEnv
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.ppo.policies import CnnPolicy, MlpPolicy
+from stable_baselines3 import A2C
+from stable_baselines3.a2c.policies import CnnPolicy as A2C_Policy
 
 import traceback
 
@@ -29,7 +31,7 @@ RENDER: defines whether or not the game should be rendered when training (render
 state: defines the game state which openAI retro should use
 """
 workers = 4
-steps = 500000
+steps = 1000000
 log_dir = './ppo_test'
 scenario= 'scenario'
 ALGORITHM = PPO

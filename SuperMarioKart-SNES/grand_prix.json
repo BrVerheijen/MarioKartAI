@@ -1,0 +1,11 @@
+{
+    "done": {
+      "script": "lua:isDoneTrain"
+    },
+    "reward":{
+      "script": "lua:getRewardTrainGrandPrix"
+    },
+    "scripts": [
+      "script.lua"
+    ]
+  }

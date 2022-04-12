@@ -19,6 +19,7 @@ from stable_baselines3.common.vec_env.dummy_vec_env import DummyVecEnv
 
 from retro_wrappers import *
 
+#Sets up retro vectorized environment for Stablebaselines3
 def retro_make_vec_env(env_id, state=retro.State.DEFAULT, scenario=None, n_envs=1, seed=None, start_index=0,
                        monitor_dir=None, wrapper_class=None, max_episode_steps=9000, env_kwargs=None,
                        vec_env_cls=None, vec_env_kwargs=None, record=False, record_path='./movies'):
@@ -42,15 +43,17 @@ def retro_make_vec_env(env_id, state=retro.State.DEFAULT, scenario=None, n_envs=
     :param vec_env_kwargs: (dict) Keyword arguments to pass to the `VecEnv` class constructor.
     :return: (VecEnv) The wrapped environment
     """
-
+    #optional keyword arguments
     env_kwargs = {} if env_kwargs is None else env_kwargs
     vec_env_kwargs = {} if vec_env_kwargs is None else vec_env_kwargs
 
     initial_state=state[0] if isinstance(state,list) else state
 
+    #Sets up Vectorized environment
     def make_env(rank):
         def _init():
             if isinstance(env_id, str):
+                #Sets up retro environment with function "make_retro" from "retro_wrapps.py"
                 if record:
                     env = make_retro(game=env_id, state=initial_state, scenario=scenario, max_episode_steps=max_episode_steps, record=record_path)
                 else:
@@ -65,6 +68,7 @@ def retro_make_vec_env(env_id, state=retro.State.DEFAULT, scenario=None, n_envs=
                 env.seed(seed + rank)
                 env.action_space.seed(seed + rank)
 
+            #Sets up monitoring
             monitor_path = os.path.join(monitor_dir, str(rank)) if monitor_dir is not None else None
 
             if monitor_path is not None:
@@ -80,14 +84,17 @@ def retro_make_vec_env(env_id, state=retro.State.DEFAULT, scenario=None, n_envs=
 
         return _init
 
+    #Sets up DummyVecEnv if no custom env is specified
     if vec_env_cls is None:
         vec_env_cls = DummyVecEnv
 
+    #Record actions of AI
     if record:
         os.makedirs(record_path, exist_ok=True)
 
     return vec_env_cls([make_env(i+ start_index) for i in range(n_envs)], **vec_env_kwargs)
 
+    #Function to create Vectorized Enivornment for Atari
 def make_mario_env(env_id, num_env, seed, cut_map=False, wrapper_kwargs=None, start_index=0, allow_early_resets=True,
                    start_method=None, use_subprocess=False):
     
@@ -106,9 +113,12 @@ def make_mario_env(env_id, num_env, seed, cut_map=False, wrapper_kwargs=None, st
         `num_env` > 1, `DummyVecEnv` is usually faster. Default: False
     :return: (VecEnv) The atari environment
     """
+
+    #optional keyword arguments
     if wrapper_kwargs is None:
         wrapper_kwargs = {}
         
+    #Sets up vectorized environment
     def make_env(rank):
         def _thunk():
             env = make_mario(env_id)
@@ -117,11 +127,13 @@ def make_mario_env(env_id, num_env, seed, cut_map=False, wrapper_kwargs=None, st
             if cut_map:
                 env = CutMarioMap(env)
 
+            #Sets up Monitoring for environment
             env = Monitor(env, 
                           Logger.get_dir() and os.path.join(Logger.get_dir(),
                           str(rank)),
                           allow_early_resets=allow_early_resets)
 
+            #Configure environment for retro games, using config similar to DeepMind-style Atari in wrap_deepmind
             return wrap_deepmind_custom(
                 env, **wrapper_kwargs)
 
@@ -129,12 +141,14 @@ def make_mario_env(env_id, num_env, seed, cut_map=False, wrapper_kwargs=None, st
     
     set_random_seed(seed)
 
+    #Returns DUmmyVecEnv or SubProcVecEnv based on whether a custom Env has been specified
     if num_env == 1 or not use_subprocess:
         return DummyVecEnv([make_env(i + start_index) for i in range(num_env)])
     
     return SubprocVecEnv([make_env(i + start_index) for i in range(num_env)],
                             start_method=start_method)
 
+#Sets up Retro environment
 def make_mario(env_id):
     """
     Create a wrapped atari Environment
@@ -147,6 +161,7 @@ def make_mario(env_id):
     env = MaxAndSkipEnv(env, skip=4)
     return env
 
+#Configure environment for retro games, similar to DeepMind-style Atari
 def wrap_deepmind_custom(env, scale=True, frame_stack=4):
     """
     Configure environment for retro games, using config similar to DeepMind-style Atari in wrap_deepmind
@@ -155,10 +170,12 @@ def wrap_deepmind_custom(env, scale=True, frame_stack=4):
     env = ClipRewardEnv(env)
     return env
 
+#Sets up Discrete Actions for Super Mario Kart
 class DiscretizerActions(Enum):
     SIMPLE = [["B"],["B","LEFT"],["B","RIGHT"],["B","L"]]
     BREAK = [["B"], ["B", "LEFT"], ["B", "RIGHT"], ["B", "L"], ['X']]
 
+#Binds discrete actions to environment
 class Discretizer(gym.ActionWrapper):
     """
     Wrap a gym-retro environment and make it use discrete
@@ -170,6 +187,7 @@ class Discretizer(gym.ActionWrapper):
         # wrong button names though
         # buttons = ["B", "A", "MODE", "START", "UP", "DOWN", "LEFT", "RIGHT", "C", "Y", "X", "Z"]
 
+        #Sets up buttons on controller
         buttons = ['B',
                    'Y',
                    'SELECT',
@@ -193,10 +211,12 @@ class Discretizer(gym.ActionWrapper):
     def action(self, a): 
         return self._actions[a].copy()
 
+#Sets up BinaryActions for environment
 class BinaryActions(Enum):
     SIMPLE = ["B", "LEFT","RIGHT", "L"] # also hop
     BREAK = ["B", "LEFT","RIGHT", "L","Y"]
 
+#Sets up BinaryActions for Discrete execution
 class ReduceBinaryActions(gym.ActionWrapper):
     """
     Wrap a gym-retro environment and make it use multi discrete actions
@@ -233,6 +253,8 @@ class ReduceBinaryActions(gym.ActionWrapper):
 
         return action
 
+
+#Resets State
 class RandomStateReset(gym.Wrapper):
     '''
     FIXME random seed, we could set a seed
@@ -251,6 +273,7 @@ class RandomStateReset(gym.Wrapper):
 
         return self.env.reset()
 
+#Terminates episode if no reward has been received for x steps
 class EarlyNegRewardTermination(gym.Wrapper):
 
     def __init__(self, env, max_steps_no_reward=40):
@@ -278,6 +301,7 @@ class EarlyNegRewardTermination(gym.Wrapper):
 
             return obs, reward, done, info
 
+#Limits time of episode in environment
 class TimeLimitWrapperMarioKart(gym.Wrapper):
     def __init__(self, env, minutes=3, seconds=0):
         super().__init__(env)
@@ -293,6 +317,7 @@ class TimeLimitWrapperMarioKart(gym.Wrapper):
                 info['time_limit_reached'] = True
         return obs, reward, done, info
 
+#Cuts Map from view of AI???
 class CutMarioMap(gym.Wrapper):
     def __init__(self, env, show_map=False):
         super(CutMarioMap, self).__init__(env)

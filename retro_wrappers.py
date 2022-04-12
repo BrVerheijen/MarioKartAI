@@ -6,6 +6,7 @@ from utils import TimeLimit
 import numpy as np
 import gym
 
+#Skips Frames with a random probabilty distribution
 class StochasticFrameSkip(gym.Wrapper):
     def __init__(self, env, n, stickprob):
         gym.Wrapper.__init__(self, env)
@@ -46,6 +47,7 @@ class StochasticFrameSkip(gym.Wrapper):
     def seed(self, s):
         self.rng.seed(s)
 
+#Stacks multiple frames into one channel
 class PartialFrameStack(gym.Wrapper):
     def __init__(self, env, k, channel=1):
         """
@@ -79,6 +81,7 @@ class PartialFrameStack(gym.Wrapper):
             for (i, frame) in enumerate(self.frames)], axis=2)
 
 
+#Downsamples image by factor given in "ratio"
 class Downsample(gym.ObservationWrapper):
     def __init__(self, env, ratio):
         """
@@ -97,7 +100,7 @@ class Downsample(gym.ObservationWrapper):
             frame = frame[:,:,None]
         return frame
 
-
+#Downsamples image to RGB2gray format 
 class Rgb2gray(gym.ObservationWrapper):
     def __init__(self, env):
         """
@@ -111,7 +114,7 @@ class Rgb2gray(gym.ObservationWrapper):
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         return frame[:,:,None]
 
-
+#Records actions of AI and saves it do .bk2 file
 class MovieRecord(gym.Wrapper):
     def __init__(self, env, savedir, k):
         gym.Wrapper.__init__(self, env)
@@ -128,7 +131,7 @@ class MovieRecord(gym.Wrapper):
         self.episode_count += 1
         return self.env.reset()
 
-
+#Handles gym environment timeouts
 class AppendTimeout(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
@@ -176,6 +179,7 @@ class AppendTimeout(gym.Wrapper):
             return { 'original': obs, 'value_estimation_timeout': fracmissing}
 
 
+#AI in gym environment will execute random actions
 class StartDoingRandomActionsWrapper(gym.Wrapper):
     """
     Warning: can eat info dicts, not good if you depend on them
@@ -208,7 +212,7 @@ class StartDoingRandomActionsWrapper(gym.Wrapper):
                 self.some_random_steps()
         return self.last_obs, reward, done, info
 
-
+#Sets up retro environment
 def make_retro(*, game, state=None, max_episode_steps=4500, **kwargs):
     import retro
     if state is None:
@@ -222,6 +226,7 @@ def make_retro(*, game, state=None, max_episode_steps=4500, **kwargs):
         env = TimeLimit(env, max_episode_steps=max_episode_steps)
     return env
 
+#Configure environment for retro like DeepMind-style Atari
 def wrap_deepmind_retro(env, scale=True, frame_stack=4):
     
     env = WarpFrame(env)
@@ -229,7 +234,7 @@ def wrap_deepmind_retro(env, scale=True, frame_stack=4):
 
     return env
 
-
+#Scales reward to be reasonable for PPO
 class RewardScaler(gym.Wrapper):
     """
     Bring rewards to a reasonable scale for PPO.
@@ -243,7 +248,7 @@ class RewardScaler(gym.Wrapper):
     def reward(self, reward):
         return reward * self.scale
 
-
+#Makes it possible for agents to go backwards, if there is no way to advance forward
 class AllowBackTracking(gym.Wrapper):
     """
     Use deltas in max(X) as the reward, rather than deltas

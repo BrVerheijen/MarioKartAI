@@ -9,7 +9,7 @@ from stable_baselines3.common.monitor import load_results
 from stable_baselines3.common.callbacks import BaseCallback
 
 
-
+#Saves model which had the best rewards
 class SaveOnBestTrainingRewardCallBack(BaseCallback):
     """
 	Callback for saving a model (the check is done every ``check_freq`` steps)
@@ -56,7 +56,7 @@ class SaveOnBestTrainingRewardCallBack(BaseCallback):
 
         return True
 
-
+#Saves model which had the best rewards
 class SaveOnBestTrainingRewardCallbackCustom(BaseCallback):
     """
 	Callback for saving a model (the check is done every ``check_freq`` steps)
@@ -75,6 +75,7 @@ class SaveOnBestTrainingRewardCallbackCustom(BaseCallback):
         self.save_path = os.path.join(log_dir, 'best_model')
         self.best_mean_reward = -np.inf
 
+        #Time steps at which program always saves a model
         self.auto_saves_timesteps = [
 			100_000, 150_000, 200_000, 250_000, 400_000, 500_000, 750_000,
 			1_000_000, 1_500_000, 2_000_00, 2_500_000, 3_000_000, 3_500_000,
@@ -122,7 +123,7 @@ class SaveOnBestTrainingRewardCallbackCustom(BaseCallback):
 
         return True
 
-
+#Sets up time limit in environment per episode
 class TimeLimitWrapper(gym.Wrapper):
     """
     :param env: (gym.Env) Gym environment that will be wrapped
@@ -153,6 +154,7 @@ class TimeLimitWrapper(gym.Wrapper):
 
 #Baselines common Wrappers
 
+#gym function for time limit
 class TimeLimit(gym.Wrapper):
     def __init__(self, env, max_episode_steps=None):
         super(TimeLimit, self).__init__(env)
@@ -171,6 +173,7 @@ class TimeLimit(gym.Wrapper):
         self._elapsed_steps = 0
         return self.env.reset(**kwargs)
 
+#Gets actions
 class ClipActionsWrappers(gym.Wrapper):
     def step(self, action):
         import numpy as np
