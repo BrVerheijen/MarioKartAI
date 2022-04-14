@@ -25,7 +25,7 @@ To train the agent you should run.
 ```python test_model_multiple.py --load best_model.zip```
 
 ## Contributors
-- Dajmen Graus
-- Lorenzo Clermonts
-- Bram Verheijen
-- Bas Ruijters
+-DGraus: Dajmen Graus
+-LorenzoClermonts: Lorenzo Clermonts
+-BrVerheijen: Bram Verheijen
+-BasRuyters: Bas Ruijters
