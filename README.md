@@ -1,7 +1,7 @@
 # Mario Kart AI
 This project contains an integration for Super Mario Kart for the Snes to be used as a gym environment with gym retro.
 
-We have created a number of different reward shapings to experiment the capabilities of the AI. They AI trains for a specific circuit and does not learn the drive on other circuits.
+We have created a number of different reward shapings to experiment the capabilities of the AI. The AI trains for a specific circuit and does not learn to drive on other circuits.
 
 ## Requirements
 -Python version: 3.8.10
